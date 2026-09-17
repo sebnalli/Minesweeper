@@ -65,3 +65,49 @@ def get_player_move():
         else:
             print("Invalid coordinate format.")
             continue 
+
+def reveal_cell(board, row, column):
+    """Reveals the selected cell if it is not flagged or already revealed."""
+    if board[row][column].flagged:
+        print("\nTile is flagged.\n")
+        return 
+    elif board[row][column].revealed:
+       print("\nTile is already revealed.\n")
+       return
+    else:
+       board[row][column].revealed = True
+       return board
+    
+def reveal_empty_area(board, row, column):
+    """
+    Recursively reveals neighboring cells when the selected cell has no adjacent mines.
+    Stops expanding when it reaches numbered, flagged, or already revealed cells.
+    """
+    current_cell = board[row][column]
+
+    rows = len(board)
+    columns = len(board[0])
+
+    if current_cell.touching > 0:
+        return
+    else:
+        offsets = [(-1,0), (1,0), (0,1), (0,-1), (-1,-1), (-1,1), (1,-1), (1, 1)]
+
+        # Calculate the neighboring cell's row and column
+        for row_offset, column_offset in offsets:
+                neighbor_row = row + row_offset
+                neighbor_column = column + column_offset
+
+                # Make sure the neighboring position is inside the board
+                if (neighbor_row >= 0) and (neighbor_row <= rows - 1):
+                    if (neighbor_column >= 0) and (neighbor_column <= columns - 1):
+
+                        # Check cell conditions: flagged & revealed        
+                        if board[neighbor_row][neighbor_column].flagged:
+                            continue
+                        elif board[neighbor_row][neighbor_column].revealed:
+                            continue
+                        else:
+                            board[neighbor_row][neighbor_column].revealed = True
+                            if board[neighbor_row][neighbor_column].touching: 
+                                reveal_empty_area(board, neighbor_row, neighbor_column)
