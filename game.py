@@ -111,3 +111,31 @@ def reveal_empty_area(board, row, column):
                             board[neighbor_row][neighbor_column].revealed = True
                             if board[neighbor_row][neighbor_column].touching: 
                                 reveal_empty_area(board, neighbor_row, neighbor_column)
+
+def toggle_flag(board, row, column):
+    """Toggles the flagged state of the selected cell."""
+    current_cell = board[row][column]
+
+    if current_cell.revealed:
+        print("\nCannot flag a revealed tile.\n")
+        return
+    
+    if not current_cell.flagged:
+        current_cell.flagged = True
+    else:
+        current_cell.flagged = False
+
+    return board
+
+def check_mine_hit(board, row, column):
+    """
+    Checks whether the selected cell contains a mine.
+
+    Returns True if the player hit a mine, otherwise returns False.
+    """
+    current_cell = board[row][column]
+
+    if current_cell.mine:
+        return True
+    else:
+        return False
