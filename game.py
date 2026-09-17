@@ -139,3 +139,23 @@ def check_mine_hit(board, row, column):
         return True
     else:
         return False
+
+def check_win(board):
+    """
+    Checks whether all non-mine cells on the board have been revealed.
+
+    Returns True if the player has won, otherwise returns False.
+    """
+    rows = len(board)
+    columns = len(board[0])
+
+    for x in range(rows):
+        for y in range(columns):
+
+            if board[x][y].mine:
+                continue
+
+            if not board[x][y].revealed:
+                return False
+        
+    return True
