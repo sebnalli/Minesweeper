@@ -1,9 +1,7 @@
 from random import sample
 
 def create_board(Cell):
-    """
-    Creates and returns a 9 x 9 Minesweeper board filled with Cell objects.
-    """
+    """ Creates and returns a 9 x 9 Minesweeper board filled with Cell objects."""
     board = []
 
     # Loops through each rows and inserts 9 cells and appends it to board
@@ -17,9 +15,7 @@ def create_board(Cell):
     return board
 
 def mine_placement(board):
-    """
-    Randomly selects 10 unique board positions and marks those cells as mines.
-    """
+    """ Randomly selects 10 unique board positions and marks those cells as mines."""
     rows = len(board)
     columns = len(board[0])
     positions = []
@@ -41,9 +37,11 @@ def mine_placement(board):
     return board
 
 def calculate_touching_mines(board):
+    """ Calculates and stores the number of adjacent mines for each non-mine cell."""
     rows = len(board)
     columns = len(board[0])
 
+    # Possible 8 neighboring cells
     offsets = [(-1,0), (1,0), (0,1), (0,-1), (-1,-1), (-1,1), (1,-1), (1, 1)]
 
     for x in range(rows):
@@ -55,11 +53,15 @@ def calculate_touching_mines(board):
                 continue
             
             for row_offset, column_offset in offsets:
+                # Calculate the neighboring cell's row and column
                 neighbor_row = x + row_offset
                 neighbor_column = y + column_offset
 
+                # Make sure the neighboring position is inside the board
                 if (neighbor_row >= 0) and (neighbor_row <= rows - 1):
                     if (neighbor_column >= 0) and (neighbor_column <= columns - 1):
+
+                        # Increase the count if the valid neighboring cell contains a mine
                         if board[neighbor_row][neighbor_column].mine:
                             current_cell.touching += 1
 
