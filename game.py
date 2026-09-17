@@ -34,3 +34,34 @@ def display_board(board):
                 print("*", end=" ")
 
         print()
+
+def get_player_move():
+    """
+    Prompts the player for a valid Minesweeper coordinate.
+
+    Converts the entered coordinate into zero-based row and column indexes
+    and returns them as a tuple.
+    """
+    while True:
+        coordinate = input("Please input a valid coordinate: ").strip()
+
+        if len(coordinate) == 2 and coordinate[0].isalpha() and coordinate[1].isdigit():
+           
+            column_letter = coordinate[0].upper()
+            row_number = int(coordinate[1])
+
+            if "A" <= column_letter <= "I" and 1 <= row_number <= 9:
+                # Convert the user-facing row number to a zero-based board index
+                row = row_number - 1
+                # Convert column letters A-I into zero-based indexes 0-8
+                column = ord(column_letter) - ord("A") 
+
+                return row, column
+
+            else:
+                print("Coordinate is out of range.")
+                continue
+
+        else:
+            print("Invalid coordinate format.")
+            continue 
