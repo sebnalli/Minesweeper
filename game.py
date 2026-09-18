@@ -1,3 +1,5 @@
+import time
+
 def display_board(board):
     """
     Displays the Minesweeper board in the terminal with row and column labels.
@@ -190,3 +192,38 @@ def reveal_all_mines(board):
                 board[x][y].revealed = True
 
     return board
+
+def get_turn_action():
+    """
+    Prompts the player to choose whether to reveal or flag a cell.
+
+    Returns either 'R' for reveal or 'F' for flag.
+    """
+    while True:
+        action = input("Reveal or Flag (R/F)").strip().upper()
+        if action != 'R' and action != 'F': continue
+        return action
+    
+def handle_loss(board, start_time):
+    """Handles the end of the game after the player reveals a mine."""
+    final_time = int(time.time() - start_time)
+
+    reveal_all_mines(board)
+    display_board(board)
+
+    print("\nGame Over! Nice Try.\n")
+    print(f"Final Time: {final_time} seconds")
+
+    return False
+    
+def handle_win(board, start_time):
+    """Handles the end of the game after all safe cells have been revealed."""
+    final_time = int(time.time() - start_time)
+    display_board(board)
+    print("\nCongratulations! You Win!\n")
+    print(f"Final Time: {final_time} seconds")
+
+    return False
+
+
+
