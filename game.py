@@ -159,3 +159,34 @@ def check_win(board):
                 return False
         
     return True
+
+def get_mine_count(board):
+    """
+    Calculates the number of mines remaining based on the number of placed flags.
+
+    Returns the remaining mine count.
+    """
+    rows = len(board)
+    columns = len(board[0])
+    mine_total = 10
+
+    for x in range(rows):
+        for y in range(columns):
+
+            if board[x][y].flagged:
+                mine_total -= 1
+
+    return mine_total
+
+def reveal_all_mines(board):
+    """Reveals all mine cells on the board."""
+    rows = len(board)
+    columns = len(board[0])
+
+    for x in range(rows):
+        for y in range(columns):
+
+            if board[x][y].mine:
+                board[x][y].revealed = True
+
+    return board

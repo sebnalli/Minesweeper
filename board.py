@@ -14,7 +14,7 @@ def create_board(Cell):
     
     return board
 
-def mine_placement(board):
+def mine_placement(board, row, column):
     """ Randomly selects 10 unique board positions and marks those cells as mines."""
     rows = len(board)
     columns = len(board[0])
@@ -24,6 +24,11 @@ def mine_placement(board):
     for x in range(rows):
         for y in range(columns):
             single_position = (x,y)
+
+            # Skip the player's first selected cell so it cannot contain a mine
+            if single_position == (row, column):
+                continue
+            
             positions.append(single_position)
 
     # Randomly samples 10 positions to be mines
@@ -31,8 +36,8 @@ def mine_placement(board):
 
     # Edit attributes of cells containing mines
     for mine in mine_positions:
-        row, column = mine
-        board[row][column].mine = True
+        mine_row, mine_column = mine
+        board[mine_row][mine_column].mine = True
 
     return board
 
