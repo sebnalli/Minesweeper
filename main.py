@@ -33,6 +33,7 @@ def start_game():
 
     while True:
 
+        # Update elapsed game time
         elapsed_time = int(time.time() - start_time)
 
         print()
@@ -43,6 +44,7 @@ def start_game():
         print(f"Mines: {mine_total}")
         print(f"Time: {elapsed_time}")
 
+        # Get the player's selected cell and action
         row, column = get_player_move()
         action = get_turn_action()
 
@@ -50,24 +52,30 @@ def start_game():
 
             current_cell = board[row][column]
 
+             # Attempt to reveal the selected cell
             result = reveal_cell(board, row, column)
             
+             # Skip the rest of the turn if the reveal was rejected
             if result is None:
                 continue
 
+             # Handle a mine hit and end the game
             if check_mine_hit(board, row, column):
                 handle_loss(board, start_time)
                 break
 
             else:
+                # Cascade through connected empty cells
                 if current_cell.touching == 0:
                     reveal_empty_area(board, row, column)
 
+                # Check whether all safe cells have been revealed
                 if check_win(board):
                     handle_win(board, start_time)
                     break
 
         else:
+             # Place or remove a flag
             toggle_flag(board, row, column)
 
 def main():

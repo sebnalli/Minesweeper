@@ -111,8 +111,7 @@ def reveal_empty_area(board, row, column):
                             continue
                         else:
                             board[neighbor_row][neighbor_column].revealed = True
-                            if board[neighbor_row][neighbor_column].touching: 
-                                reveal_empty_area(board, neighbor_row, neighbor_column)
+                            reveal_empty_area(board, neighbor_row, neighbor_column)
 
 def toggle_flag(board, row, column):
     """Toggles the flagged state of the selected cell."""
