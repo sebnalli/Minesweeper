@@ -1,6 +1,7 @@
 import pygame
 from src.core.cell import Cell
 from src.core.board import create_board
+from src.core.game import reveal_cell
 
 pygame.init()
 
@@ -43,6 +44,18 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            mouse_x, mouse_y = event.pos
+
+            # Convert the mouse position into a board row and column
+            column = mouse_x // TILE_SIZE
+            row = mouse_y // TILE_SIZE
+
+            print(f"Row: {row}, Column: {column}")
+
+            # Reveal the tile
+            reveal_cell(board, row, column)
 
     for row in range(BOARD_SIZE):
         for column in range(BOARD_SIZE):
