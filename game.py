@@ -1,6 +1,6 @@
 import time
 
-def display_board(board):
+def display_board(board, game_over=False):
     """
     Displays the Minesweeper board in the terminal with row and column labels.
 
@@ -20,7 +20,10 @@ def display_board(board):
         for y in range(columns):
 
             # Display each cell based on whether it is flagged, hidden, revealed, or a mine
-            if board[x][y].flagged:
+            if game_over and board[x][y].mine and board[x][y].revealed:
+                print("*", end=" ")
+
+            elif board[x][y].flagged:
                 print("F", end=" ")
 
             elif not board[x][y].revealed:
@@ -31,7 +34,7 @@ def display_board(board):
                     print(f"{board[x][y].touching}", end=" ")
                 else:
                     print(" ", end=" ")
-            
+
             else:
                 print("*", end=" ")
 
@@ -92,26 +95,26 @@ def reveal_empty_area(board, row, column):
 
     if current_cell.touching > 0:
         return
-    else:
-        offsets = [(-1,0), (1,0), (0,1), (0,-1), (-1,-1), (-1,1), (1,-1), (1, 1)]
+    
+    offsets = [(-1,0), (1,0), (0,1), (0,-1), (-1,-1), (-1,1), (1,-1), (1, 1)]
 
-        # Calculate the neighboring cell's row and column
-        for row_offset, column_offset in offsets:
-                neighbor_row = row + row_offset
-                neighbor_column = column + column_offset
+    # Calculate the neighboring cell's row and column
+    for row_offset, column_offset in offsets:
+            neighbor_row = row + row_offset
+            neighbor_column = column + column_offset
 
-                # Make sure the neighboring position is inside the board
-                if (neighbor_row >= 0) and (neighbor_row <= rows - 1):
-                    if (neighbor_column >= 0) and (neighbor_column <= columns - 1):
+            # Make sure the neighboring position is inside the board
+            if (neighbor_row >= 0) and (neighbor_row <= rows - 1):
+                if (neighbor_column >= 0) and (neighbor_column <= columns - 1):
 
-                        # Check cell conditions: flagged & revealed        
-                        if board[neighbor_row][neighbor_column].flagged:
-                            continue
-                        elif board[neighbor_row][neighbor_column].revealed:
-                            continue
-                        else:
-                            board[neighbor_row][neighbor_column].revealed = True
-                            reveal_empty_area(board, neighbor_row, neighbor_column)
+                    # Check cell conditions: flagged & revealed        
+                    if board[neighbor_row][neighbor_column].flagged:
+                        continue
+                    elif board[neighbor_row][neighbor_column].revealed:
+                        continue
+                    else:
+                        board[neighbor_row][neighbor_column].revealed = True
+                        reveal_empty_area(board, neighbor_row, neighbor_column)
 
 def toggle_flag(board, row, column):
     """Toggles the flagged state of the selected cell."""
@@ -138,8 +141,8 @@ def check_mine_hit(board, row, column):
 
     if current_cell.mine:
         return True
-    else:
-        return False
+    
+    return False
 
 def check_win(board):
     """
@@ -208,7 +211,7 @@ def handle_loss(board, start_time):
     final_time = int(time.time() - start_time)
 
     reveal_all_mines(board)
-    display_board(board)
+    display_board(board, True)
 
     print("\nGame Over! Nice Try.\n")
     print(f"Final Time: {final_time} seconds")
