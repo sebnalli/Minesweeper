@@ -1,6 +1,6 @@
-from cell import Cell
-from board import create_board, mine_placement, calculate_touching_mines
-from game import *
+from Minesweeper.src.tests.core.cell import Cell
+from Minesweeper.src.tests.core.board import create_board, mine_placement, calculate_touching_mines
+from Minesweeper.src.tests.core.game import *
 import time
 
 
