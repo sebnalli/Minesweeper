@@ -45,7 +45,7 @@ def get_player_move():
     and returns them as a tuple.
     """
     while True:
-        coordinate = input("Please input a valid coordinate: ").strip()
+        coordinate = input("\nPlease input a valid coordinate: ").strip()
 
         if len(coordinate) == 2 and coordinate[0].isalpha() and coordinate[1].isdigit():
            
