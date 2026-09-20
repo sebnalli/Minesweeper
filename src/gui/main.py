@@ -1,17 +1,24 @@
 import pygame
 from src.core.cell import Cell
 from src.core.board import create_board, mine_placement, calculate_touching_mines
-from src.core.game import reveal_cell, reveal_empty_area, toggle_flag
+from src.core.game import (
+    reveal_cell,
+    reveal_empty_area,
+    toggle_flag,
+    check_mine_hit,
+    reveal_all_mines,
+    check_win
+)
 
 pygame.init()
 
 # Board and tile dimensions
-TILE_SIZE = 70
+TILE_SIZE = 60
 BOARD_SIZE = 9
 
 # Flag and mine size
-FLAG_SIZE = 50
-MINE_SIZE = 60
+FLAG_SIZE = 40
+MINE_SIZE = 50
 
 WIDTH = TILE_SIZE * BOARD_SIZE
 HEIGHT = TILE_SIZE * BOARD_SIZE
@@ -72,7 +79,7 @@ flag_image = pygame.transform.scale(flag_image, (FLAG_SIZE, FLAG_SIZE))
 board = create_board(Cell)
 
 first_click = True
-
+game_over = False
 running = True
 
 while running:
@@ -80,7 +87,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not game_over:
             mouse_x, mouse_y = event.pos
 
             # Convert the mouse position into a board row and column
@@ -94,13 +101,27 @@ while running:
                 first_click = False
 
             # Reveal the tile
-            reveal_cell(board, row, column)
+            result = reveal_cell(board, row, column)
+
+            # Stop processing the click if the tile could not be revealed
+            if result is None:
+                continue
+            
+            # Handle loss if the selected tile contains a mine
+            if check_mine_hit(board, row, column):
+                reveal_all_mines(board)
+                game_over = True
 
             # cascades tiles not touching mines
-            if not board[row][column].mine and board[row][column].touching == 0:
+            elif not board[row][column].mine and board[row][column].touching == 0:
                 reveal_empty_area(board, row, column)
+            
+            # Check whether all safe tiles have been revealed
+            if not game_over and check_win(board):
+                game_over = True
+                print("You Win!")
 
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3 and not game_over:
             mouse_x, mouse_y = event.pos
 
             # Convert the mouse position into a board row and column
