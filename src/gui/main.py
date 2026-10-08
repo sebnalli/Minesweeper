@@ -1,27 +1,20 @@
 import pygame
 from src.core.cell import Cell
 from src.core.board import create_board, mine_placement, calculate_touching_mines
+from src.gui.config import *
+from src.gui.ui import draw_raised_panel, draw_sunken_panel, draw_counter_box
 from src.core.game import (
     reveal_cell,
     reveal_empty_area,
     toggle_flag,
     check_mine_hit,
     reveal_all_mines,
-    check_win
+    check_win,
+    get_mine_count
 )
 
+
 pygame.init()
-
-# Board and tile dimensions
-TILE_SIZE = 60
-BOARD_SIZE = 9
-
-# Flag and mine size
-FLAG_SIZE = 40
-MINE_SIZE = 50
-
-WIDTH = TILE_SIZE * BOARD_SIZE
-HEIGHT = TILE_SIZE * BOARD_SIZE
 
 # Open window display
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -52,22 +45,24 @@ number_font = pygame.font.Font(
     28
 )
 
+# Mine counter number
+counter_font = pygame.font.Font(
+    "src/gui/assets/pixel_font.ttf",
+    22
+)
+
 # Flag
 flag_image = pygame.image.load(
     "src/gui/assets/flag.png"
 ).convert_alpha()
 
-# Corresponding colors to numbers
-NUMBER_COLORS = {
-    1: (0, 0, 255),
-    2: (0, 128, 0),
-    3: (255, 0, 0),
-    4: (0, 0, 128),
-    5: (128, 0, 0),
-    6: (0, 128, 128),
-    7: (0, 0, 0),
-    8: (128, 128, 128),
-}
+smiley_normal = pygame.image.load(
+    "src/gui/assets/smiley.png"
+).convert_alpha()
+
+smiley_loss = pygame.image.load(
+    "src/gui/assets/smiley_loss.png"
+).convert_alpha()
 
 # Scale assets to match tile size
 hidden_tile = pygame.transform.scale(hidden_tile, (TILE_SIZE, TILE_SIZE))
@@ -75,6 +70,9 @@ revealed_light = pygame.transform.scale(revealed_light, (TILE_SIZE, TILE_SIZE))
 revealed_dark = pygame.transform.scale(revealed_dark, (TILE_SIZE, TILE_SIZE))
 mine_image = pygame.transform.scale(mine_image, (MINE_SIZE, MINE_SIZE))
 flag_image = pygame.transform.scale(flag_image, (FLAG_SIZE, FLAG_SIZE))
+smiley_normal = pygame.transform.scale(smiley_normal, (SMILEY_SIZE, SMILEY_SIZE))
+smiley_loss = pygame.transform.scale(smiley_loss, (SMILEY_SIZE, SMILEY_SIZE))
+
 # Create board
 board = create_board(Cell)
 
@@ -91,8 +89,16 @@ while running:
             mouse_x, mouse_y = event.pos
 
             # Convert the mouse position into a board row and column
-            column = mouse_x // TILE_SIZE
-            row = mouse_y // TILE_SIZE
+            # Ignore clicks outside the board
+            if not (
+                BOARD_X <= mouse_x < BOARD_X + BOARD_WIDTH
+                and BOARD_Y <= mouse_y < BOARD_Y + BOARD_HEIGHT
+            ):
+                continue
+
+            # Convert screen position into board row and column
+            column = (mouse_x - BOARD_X) // TILE_SIZE
+            row = (mouse_y - BOARD_Y) // TILE_SIZE
 
             # Handles first-click safety, places mines, and assigns touching-mine counts
             if first_click:
@@ -125,18 +131,90 @@ while running:
             mouse_x, mouse_y = event.pos
 
             # Convert the mouse position into a board row and column
-            column = mouse_x // TILE_SIZE
-            row = mouse_y // TILE_SIZE
+            # Ignore clicks outside the board
+            if not (
+                BOARD_X <= mouse_x < BOARD_X + BOARD_WIDTH
+                and BOARD_Y <= mouse_y < BOARD_Y + BOARD_HEIGHT
+            ):
+                continue
+
+            # Convert screen position into board row and column
+            column = (mouse_x - BOARD_X) // TILE_SIZE
+            row = (mouse_y - BOARD_Y) // TILE_SIZE
 
             # Flag or unflag the tile
             toggle_flag(board, row, column)
+
+    # Fills entire window background
+    screen.fill(BACKGROUND_COLOR)
+
+    # Draw box smiley sits in
+    smiley_box_x = (WIDTH - SMILEY_BOX_SIZE) // 2
+    smiley_box_y = OUTER_MARGIN + (TOP_PANEL_HEIGHT - SMILEY_BOX_SIZE) // 2
+
+    # Draw top control panel
+    draw_raised_panel(
+        screen,
+        smiley_box_x,
+        smiley_box_y,
+        SMILEY_BOX_SIZE,
+        SMILEY_BOX_SIZE,
+        BACKGROUND_COLOR
+    )
+
+    # Center the smiley in the top panel
+    smiley_x = smiley_box_x + (SMILEY_BOX_SIZE - SMILEY_SIZE) // 2
+    smiley_y = smiley_box_y + (SMILEY_BOX_SIZE - SMILEY_SIZE) // 2
+
+    screen.blit(smiley_normal, (smiley_x, smiley_y))
+
+    # Draw recessed board frame
+    draw_sunken_panel(
+        screen,
+        BOARD_X - BOARD_FRAME_PADDING,
+        BOARD_Y - BOARD_FRAME_PADDING,
+        BOARD_WIDTH + (BOARD_FRAME_PADDING * 2),
+        BOARD_HEIGHT + (BOARD_FRAME_PADDING * 2),
+        BACKGROUND_COLOR
+    )
+
+    # Update mine counter
+    mine_total = get_mine_count(board)
+
+    # Draw mine counter box
+    draw_counter_box(
+        screen,
+        COUNTER_X,
+        COUNTER_Y,
+        COUNTER_WIDTH,
+        COUNTER_HEIGHT,
+        COUNTER_BACKGROUND
+    )
+
+    # Render the remaining mine count as a 3-digit number
+    counter_surface = counter_font.render(
+        f"{mine_total:03}",
+        False,
+        COUNTER_TEXT_COLOR
+    )
+
+    # Create a rectangle for the counter text and center it in the counter box
+    counter_rect = counter_surface.get_rect(
+        center=(
+            COUNTER_X + COUNTER_WIDTH // 2,
+            COUNTER_Y + COUNTER_HEIGHT // 2
+        )
+    )
+
+    # Draw the mine counter number on the screen
+    screen.blit(counter_surface, counter_rect)
 
     for row in range(BOARD_SIZE):
         for column in range(BOARD_SIZE):
 
             # Calculate tile position
-            x = column * TILE_SIZE
-            y = row * TILE_SIZE
+            x = BOARD_X + column * TILE_SIZE
+            y = BOARD_Y + row * TILE_SIZE   
 
             current_cell = board[row][column]
 

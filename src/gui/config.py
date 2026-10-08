@@ -1,0 +1,56 @@
+# Board dimensions
+TILE_SIZE = 60
+BOARD_SIZE = 9
+
+BOARD_WIDTH = TILE_SIZE * BOARD_SIZE
+BOARD_HEIGHT = TILE_SIZE * BOARD_SIZE
+
+# Asset sizes
+FLAG_SIZE = 40
+MINE_SIZE = 50
+SMILEY_SIZE = 65
+SMILEY_BOX_SIZE = 70
+
+# Outer UI layout
+OUTER_MARGIN = 16
+TOP_PANEL_HEIGHT = 100
+BOARD_FRAME_PADDING = 10
+
+# Mine counter
+COUNTER_WIDTH = 90
+COUNTER_HEIGHT = 50
+
+# Position the counter inside the top-left panel area
+COUNTER_X = OUTER_MARGIN + 20
+COUNTER_Y = OUTER_MARGIN + (TOP_PANEL_HEIGHT - COUNTER_HEIGHT) // 2
+
+# Counter colors
+COUNTER_BACKGROUND = (50, 35, 40)
+COUNTER_TEXT_COLOR = (255, 70, 140)
+
+# Position of the board inside the window
+BOARD_X = OUTER_MARGIN + BOARD_FRAME_PADDING
+BOARD_Y = OUTER_MARGIN + TOP_PANEL_HEIGHT + BOARD_FRAME_PADDING
+
+WIDTH = BOARD_WIDTH + (OUTER_MARGIN * 2) + (BOARD_FRAME_PADDING * 2)
+HEIGHT = (
+    BOARD_HEIGHT
+    + TOP_PANEL_HEIGHT
+    + (OUTER_MARGIN * 2)
+    + (BOARD_FRAME_PADDING * 2)
+)
+
+# Colors
+BACKGROUND_COLOR = (190, 170, 175)
+
+# Number colors
+NUMBER_COLORS = {
+    1: (0, 0, 255),
+    2: (0, 128, 0),
+    3: (255, 0, 0),
+    4: (0, 0, 128),
+    5: (128, 0, 0),
+    6: (0, 128, 128),
+    7: (0, 0, 0),
+    8: (128, 128, 128),
+}

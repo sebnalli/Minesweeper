@@ -1,5 +1,3 @@
-import time
-
 def reveal_cell(board, row, column):
     """Reveals the selected cell if it is not flagged or already revealed."""
     if board[row][column].flagged:
