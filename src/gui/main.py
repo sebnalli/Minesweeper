@@ -78,6 +78,7 @@ board = create_board(Cell)
 
 first_click = True
 game_over = False
+lost = False
 running = True
 
 while running:
@@ -117,6 +118,7 @@ while running:
             if check_mine_hit(board, row, column):
                 reveal_all_mines(board)
                 game_over = True
+                lost = True
 
             # cascades tiles not touching mines
             elif not board[row][column].mine and board[row][column].touching == 0:
@@ -166,7 +168,11 @@ while running:
     smiley_x = smiley_box_x + (SMILEY_BOX_SIZE - SMILEY_SIZE) // 2
     smiley_y = smiley_box_y + (SMILEY_BOX_SIZE - SMILEY_SIZE) // 2
 
-    screen.blit(smiley_normal, (smiley_x, smiley_y))
+    # Draw the correct smiley for the current game state
+    if lost:
+        screen.blit(smiley_loss, (smiley_x, smiley_y))
+    else:
+        screen.blit(smiley_normal, (smiley_x, smiley_y))
 
     # Draw recessed board frame
     draw_sunken_panel(
