@@ -64,6 +64,10 @@ smiley_loss = pygame.image.load(
     "src/gui/assets/smiley_loss.png"
 ).convert_alpha()
 
+smiley_win = pygame.image.load(
+    "src/gui/assets/smiley_win.png"
+).convert_alpha()
+
 # Scale assets to match tile size
 hidden_tile = pygame.transform.scale(hidden_tile, (TILE_SIZE, TILE_SIZE))
 revealed_light = pygame.transform.scale(revealed_light, (TILE_SIZE, TILE_SIZE))
@@ -72,6 +76,7 @@ mine_image = pygame.transform.scale(mine_image, (MINE_SIZE, MINE_SIZE))
 flag_image = pygame.transform.scale(flag_image, (FLAG_SIZE, FLAG_SIZE))
 smiley_normal = pygame.transform.scale(smiley_normal, (SMILEY_SIZE, SMILEY_SIZE))
 smiley_loss = pygame.transform.scale(smiley_loss, (SMILEY_SIZE, SMILEY_SIZE))
+smiley_win = pygame.transform.scale(smiley_win, (SMILEY_SIZE, SMILEY_SIZE))
 
 # Create board
 board = create_board(Cell)
@@ -79,6 +84,7 @@ board = create_board(Cell)
 first_click = True
 game_over = False
 lost = False
+won = False
 running = True
 
 while running:
@@ -127,6 +133,7 @@ while running:
             # Check whether all safe tiles have been revealed
             if not game_over and check_win(board):
                 game_over = True
+                won = True
                 print("You Win!")
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3 and not game_over:
@@ -171,6 +178,8 @@ while running:
     # Draw the correct smiley for the current game state
     if lost:
         screen.blit(smiley_loss, (smiley_x, smiley_y))
+    elif won:
+        screen.blit(smiley_win, (smiley_x, smiley_y))
     else:
         screen.blit(smiley_normal, (smiley_x, smiley_y))
 
