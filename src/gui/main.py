@@ -85,12 +85,41 @@ first_click = True
 game_over = False
 lost = False
 won = False
+
+# Timer state
+timer_started = False
+start_ticks = 0
+elapsed_seconds = 0
+
 running = True
 
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+        # Check for smiley reset click
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            mouse_x, mouse_y = event.pos
+
+            if (
+                SMILEY_BOX_X <= mouse_x < SMILEY_BOX_X + SMILEY_BOX_SIZE
+                and SMILEY_BOX_Y <= mouse_y < SMILEY_BOX_Y + SMILEY_BOX_SIZE
+            ):
+                # reset game state
+                board = create_board(Cell)
+
+                first_click = True
+                game_over = False
+                lost = False
+                won = False
+
+                timer_started = False
+                start_ticks = 0
+                elapsed_seconds = 0
+
+                # reset loop
+                continue
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not game_over:
             mouse_x, mouse_y = event.pos
@@ -106,11 +135,16 @@ while running:
             # Convert screen position into board row and column
             column = (mouse_x - BOARD_X) // TILE_SIZE
             row = (mouse_y - BOARD_Y) // TILE_SIZE
-
+            
             # Handles first-click safety, places mines, and assigns touching-mine counts
             if first_click:
                 mine_placement(board, row, column)
                 calculate_touching_mines(board)
+
+                # Start the timer on the first revealed tile
+                start_ticks = pygame.time.get_ticks()
+                timer_started = True
+
                 first_click = False
 
             # Reveal the tile
@@ -154,26 +188,29 @@ while running:
             # Flag or unflag the tile
             toggle_flag(board, row, column)
 
+    # Update timer while the game is active
+    if timer_started and not game_over:
+        elapsed_seconds = (pygame.time.get_ticks() - start_ticks) // 1000
+
+    # Keep the timer within the 3-digit display
+    elapsed_seconds = min(elapsed_seconds, 999)
+
     # Fills entire window background
     screen.fill(BACKGROUND_COLOR)
-
-    # Draw box smiley sits in
-    smiley_box_x = (WIDTH - SMILEY_BOX_SIZE) // 2
-    smiley_box_y = OUTER_MARGIN + (TOP_PANEL_HEIGHT - SMILEY_BOX_SIZE) // 2
 
     # Draw top control panel
     draw_raised_panel(
         screen,
-        smiley_box_x,
-        smiley_box_y,
+        SMILEY_BOX_X,
+        SMILEY_BOX_Y,
         SMILEY_BOX_SIZE,
         SMILEY_BOX_SIZE,
         BACKGROUND_COLOR
     )
 
     # Center the smiley in the top panel
-    smiley_x = smiley_box_x + (SMILEY_BOX_SIZE - SMILEY_SIZE) // 2
-    smiley_y = smiley_box_y + (SMILEY_BOX_SIZE - SMILEY_SIZE) // 2
+    smiley_x = SMILEY_BOX_X + (SMILEY_BOX_SIZE - SMILEY_SIZE) // 2
+    smiley_y = SMILEY_BOX_Y + (SMILEY_BOX_SIZE - SMILEY_SIZE) // 2
 
     # Draw the correct smiley for the current game state
     if lost:
@@ -223,6 +260,32 @@ while running:
 
     # Draw the mine counter number on the screen
     screen.blit(counter_surface, counter_rect)
+
+    # Draw timer box
+    draw_counter_box(
+        screen,
+        TIMER_X,
+        TIMER_Y,
+        COUNTER_WIDTH,
+        COUNTER_HEIGHT,
+        COUNTER_BACKGROUND
+    )
+
+    # Render timer as a 3-digit number
+    timer_surface = counter_font.render(
+        f"{elapsed_seconds:03}",
+        False,
+        COUNTER_TEXT_COLOR
+    )
+
+    timer_rect = timer_surface.get_rect(
+        center=(
+            TIMER_X + COUNTER_WIDTH // 2,
+            TIMER_Y + COUNTER_HEIGHT // 2
+        )
+    )
+
+    screen.blit(timer_surface, timer_rect)
 
     for row in range(BOARD_SIZE):
         for column in range(BOARD_SIZE):

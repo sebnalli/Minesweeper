@@ -16,7 +16,7 @@ OUTER_MARGIN = 16
 TOP_PANEL_HEIGHT = 100
 BOARD_FRAME_PADDING = 10
 
-# Mine counter
+# Counter displays
 COUNTER_WIDTH = 90
 COUNTER_HEIGHT = 50
 
@@ -40,6 +40,14 @@ HEIGHT = (
     + (BOARD_FRAME_PADDING * 2)
 )
 
+# Position the smiley box in the center of the top panel
+SMILEY_BOX_X = (WIDTH - SMILEY_BOX_SIZE) // 2
+SMILEY_BOX_Y = OUTER_MARGIN + (TOP_PANEL_HEIGHT - SMILEY_BOX_SIZE) // 2
+
+# Position the timer inside the top-right panel area
+TIMER_X = WIDTH - OUTER_MARGIN - 20 - COUNTER_WIDTH
+TIMER_Y = COUNTER_Y
+
 # Colors
 BACKGROUND_COLOR = (190, 170, 175)
 
@@ -54,3 +62,4 @@ NUMBER_COLORS = {
     7: (0, 0, 0),
     8: (128, 128, 128),
 }
+
