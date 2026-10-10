@@ -91,7 +91,7 @@ def check_win(board):
         
     return True
 
-def get_mine_count(board):
+def get_mine_count(board, mine_count=10):
     """
     Calculates the number of mines remaining based on the number of placed flags.
 
@@ -99,7 +99,7 @@ def get_mine_count(board):
     """
     rows = len(board)
     columns = len(board[0])
-    mine_total = 10
+    mine_total = mine_count
 
     for x in range(rows):
         for y in range(columns):

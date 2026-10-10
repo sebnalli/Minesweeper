@@ -14,6 +14,32 @@ from src.core.game import (
 )
 
 
+# Set the current difficulty and load its board settings
+current_difficulty = "intermediate"
+BOARD_ROWS, BOARD_COLUMNS, MINE_COUNT, TILE_SIZE = DIFFICULTIES[current_difficulty]
+
+# Recalculate board size based on the selected difficulty
+BOARD_WIDTH = TILE_SIZE * BOARD_COLUMNS
+BOARD_HEIGHT = TILE_SIZE * BOARD_ROWS
+
+# Recalculate window size to fit the board
+WIDTH = BOARD_WIDTH + (OUTER_MARGIN * 2) + (BOARD_FRAME_PADDING * 2)
+HEIGHT = (
+    BOARD_HEIGHT
+    + TOP_PANEL_HEIGHT
+    + (OUTER_MARGIN * 2)
+    + (BOARD_FRAME_PADDING * 2)
+)
+
+# Reposition the smiley and timer for the new window width
+SMILEY_BOX_X = (WIDTH - SMILEY_BOX_SIZE) // 2
+TIMER_X = WIDTH - OUTER_MARGIN - 20 - COUNTER_WIDTH
+
+# Reposition the home button beside the smiley
+HOME_X = SMILEY_BOX_X + SMILEY_BOX_SIZE + 12
+HOME_Y = SMILEY_BOX_Y + (SMILEY_BOX_SIZE - HOME_SIZE) // 2
+
+
 pygame.init()
 
 # Open window display
@@ -56,16 +82,24 @@ flag_image = pygame.image.load(
     "src/gui/assets/flag.png"
 ).convert_alpha()
 
+# Standard smiley state
 smiley_normal = pygame.image.load(
     "src/gui/assets/smiley.png"
 ).convert_alpha()
 
+# Smiley loss state
 smiley_loss = pygame.image.load(
     "src/gui/assets/smiley_loss.png"
 ).convert_alpha()
 
+# Smiley win state
 smiley_win = pygame.image.load(
     "src/gui/assets/smiley_win.png"
+).convert_alpha()
+
+# Home button
+home_image = pygame.image.load(
+    "src/gui/assets/home.png"
 ).convert_alpha()
 
 # Scale assets to match tile size
@@ -77,9 +111,10 @@ flag_image = pygame.transform.scale(flag_image, (FLAG_SIZE, FLAG_SIZE))
 smiley_normal = pygame.transform.scale(smiley_normal, (SMILEY_SIZE, SMILEY_SIZE))
 smiley_loss = pygame.transform.scale(smiley_loss, (SMILEY_SIZE, SMILEY_SIZE))
 smiley_win = pygame.transform.scale(smiley_win, (SMILEY_SIZE, SMILEY_SIZE))
+home_image = pygame.transform.scale(home_image, (HOME_SIZE, HOME_SIZE))
 
 # Create board
-board = create_board(Cell)
+board = create_board(Cell, BOARD_ROWS, BOARD_COLUMNS)
 
 first_click = True
 game_over = False
@@ -103,11 +138,17 @@ while running:
             mouse_x, mouse_y = event.pos
 
             if (
+                HOME_X <= mouse_x < HOME_X + HOME_SIZE
+                and HOME_Y <= mouse_y < HOME_Y + HOME_SIZE
+                ):
+                    # Home menu logic will go here
+                    continue
+            if (
                 SMILEY_BOX_X <= mouse_x < SMILEY_BOX_X + SMILEY_BOX_SIZE
                 and SMILEY_BOX_Y <= mouse_y < SMILEY_BOX_Y + SMILEY_BOX_SIZE
             ):
                 # reset game state
-                board = create_board(Cell)
+                board = create_board(Cell, BOARD_ROWS, BOARD_COLUMNS)
 
                 first_click = True
                 game_over = False
@@ -138,7 +179,7 @@ while running:
             
             # Handles first-click safety, places mines, and assigns touching-mine counts
             if first_click:
-                mine_placement(board, row, column)
+                mine_placement(board, row, column, MINE_COUNT)
                 calculate_touching_mines(board)
 
                 # Start the timer on the first revealed tile
@@ -220,6 +261,8 @@ while running:
     else:
         screen.blit(smiley_normal, (smiley_x, smiley_y))
 
+    # Draw home button beside the smiley
+    screen.blit(home_image, (HOME_X, HOME_Y))
     # Draw recessed board frame
     draw_sunken_panel(
         screen,
@@ -231,7 +274,7 @@ while running:
     )
 
     # Update mine counter
-    mine_total = get_mine_count(board)
+    mine_total = get_mine_count(board, MINE_COUNT)
 
     # Draw mine counter box
     draw_counter_box(
@@ -287,8 +330,8 @@ while running:
 
     screen.blit(timer_surface, timer_rect)
 
-    for row in range(BOARD_SIZE):
-        for column in range(BOARD_SIZE):
+    for row in range(BOARD_ROWS):
+        for column in range(BOARD_COLUMNS):
 
             # Calculate tile position
             x = BOARD_X + column * TILE_SIZE

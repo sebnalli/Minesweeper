@@ -1,15 +1,27 @@
 # Board dimensions
 TILE_SIZE = 60
-BOARD_SIZE = 9
+BOARD_ROWS = 9
+BOARD_COLUMNS = 9
 
-BOARD_WIDTH = TILE_SIZE * BOARD_SIZE
-BOARD_HEIGHT = TILE_SIZE * BOARD_SIZE
+# Mine count constant
+MINE_COUNT = 10
+
+# Difficulty settings
+DIFFICULTIES = {
+    "beginner": (9, 9, 10, 60),
+    "intermediate": (16, 16, 40, 40),
+    "expert": (16, 30, 99, 42)
+}
+
+BOARD_WIDTH = TILE_SIZE * BOARD_COLUMNS
+BOARD_HEIGHT = TILE_SIZE * BOARD_ROWS
 
 # Asset sizes
 FLAG_SIZE = 40
 MINE_SIZE = 50
 SMILEY_SIZE = 65
 SMILEY_BOX_SIZE = 70
+HOME_SIZE = 30
 
 # Outer UI layout
 OUTER_MARGIN = 16
@@ -43,6 +55,10 @@ HEIGHT = (
 # Position the smiley box in the center of the top panel
 SMILEY_BOX_X = (WIDTH - SMILEY_BOX_SIZE) // 2
 SMILEY_BOX_Y = OUTER_MARGIN + (TOP_PANEL_HEIGHT - SMILEY_BOX_SIZE) // 2
+
+# Position the home button beside the smiley
+HOME_X = SMILEY_BOX_X + SMILEY_BOX_SIZE + 12
+HOME_Y = SMILEY_BOX_Y + (SMILEY_BOX_SIZE - HOME_SIZE) // 2
 
 # Position the timer inside the top-right panel area
 TIMER_X = WIDTH - OUTER_MARGIN - 20 - COUNTER_WIDTH

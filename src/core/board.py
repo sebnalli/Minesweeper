@@ -1,21 +1,21 @@
 from random import sample
 
-def create_board(Cell):
-    """ Creates and returns a 9 x 9 Minesweeper board filled with Cell objects."""
+def create_board(Cell, rows=9, columns=9):
+    """ Creates and returns a Minesweeper board filled with Cell objects."""
     board = []
 
-    # Loops through each rows and inserts 9 cells and appends it to board
-    for y in range(9): 
+    # Loops through each row and fills it with cells
+    for y in range(rows): 
         row = []
-        for x in range(9):
+        for x in range(columns):
             new_cell = Cell()
             row.append(new_cell)
         board.append(row)    
     
     return board
 
-def mine_placement(board, row, column):
-    """ Randomly selects 10 unique board positions and marks those cells as mines."""
+def mine_placement(board, row, column, mine_count=10):
+    """ Randomly selects unique board positions and marks those cells as mines."""
     rows = len(board)
     columns = len(board[0])
     positions = []
@@ -31,8 +31,8 @@ def mine_placement(board, row, column):
             
             positions.append(single_position)
 
-    # Randomly samples 10 positions to be mines
-    mine_positions = sample(positions, 10)
+    # Randomly samples positions to be mines
+    mine_positions = sample(positions, mine_count)
 
     # Edit attributes of cells containing mines
     for mine in mine_positions:
