@@ -79,3 +79,7 @@ NUMBER_COLORS = {
     8: (128, 128, 128),
 }
 
+# Difficulty button colors
+BEGINNER_COLOR = (80, 160, 90)
+INTERMEDIATE_COLOR = (220, 150, 60)
+EXPERT_COLOR = (190, 70, 70)

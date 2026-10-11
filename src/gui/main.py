@@ -13,32 +13,45 @@ from src.core.game import (
     get_mine_count
 )
 
+def apply_difficulty(difficulty):
+    # Load the board settings for the selected difficulty
+    BOARD_ROWS, BOARD_COLUMNS, MINE_COUNT, TILE_SIZE = DIFFICULTIES[difficulty]
 
-# Set the current difficulty and load its board settings
-current_difficulty = "intermediate"
-BOARD_ROWS, BOARD_COLUMNS, MINE_COUNT, TILE_SIZE = DIFFICULTIES[current_difficulty]
+    # Recalculate board size for the selected difficulty
+    BOARD_WIDTH = TILE_SIZE * BOARD_COLUMNS
+    BOARD_HEIGHT = TILE_SIZE * BOARD_ROWS
 
-# Recalculate board size based on the selected difficulty
-BOARD_WIDTH = TILE_SIZE * BOARD_COLUMNS
-BOARD_HEIGHT = TILE_SIZE * BOARD_ROWS
+    # Recalculate window size to fit the new board
+    WIDTH = BOARD_WIDTH + (OUTER_MARGIN * 2) + (BOARD_FRAME_PADDING * 2)
+    HEIGHT = (
+        BOARD_HEIGHT
+        + TOP_PANEL_HEIGHT
+        + (OUTER_MARGIN * 2)
+        + (BOARD_FRAME_PADDING * 2)
+    )
 
-# Recalculate window size to fit the board
-WIDTH = BOARD_WIDTH + (OUTER_MARGIN * 2) + (BOARD_FRAME_PADDING * 2)
-HEIGHT = (
-    BOARD_HEIGHT
-    + TOP_PANEL_HEIGHT
-    + (OUTER_MARGIN * 2)
-    + (BOARD_FRAME_PADDING * 2)
+    # Reposition the top panel controls for the new window width
+    SMILEY_BOX_X = (WIDTH - SMILEY_BOX_SIZE) // 2
+    TIMER_X = WIDTH - OUTER_MARGIN - 20 - COUNTER_WIDTH
+
+    # Reposition the home button beside the smiley
+    HOME_X = SMILEY_BOX_X + SMILEY_BOX_SIZE + 12
+    HOME_Y = SMILEY_BOX_Y + (SMILEY_BOX_SIZE - HOME_SIZE) // 2
+
+    return (
+    BOARD_ROWS,
+    BOARD_COLUMNS,
+    MINE_COUNT,
+    TILE_SIZE,
+    BOARD_WIDTH,
+    BOARD_HEIGHT,
+    WIDTH,
+    HEIGHT,
+    SMILEY_BOX_X,
+    TIMER_X,
+    HOME_X,
+    HOME_Y
 )
-
-# Reposition the smiley and timer for the new window width
-SMILEY_BOX_X = (WIDTH - SMILEY_BOX_SIZE) // 2
-TIMER_X = WIDTH - OUTER_MARGIN - 20 - COUNTER_WIDTH
-
-# Reposition the home button beside the smiley
-HOME_X = SMILEY_BOX_X + SMILEY_BOX_SIZE + 12
-HOME_Y = SMILEY_BOX_Y + (SMILEY_BOX_SIZE - HOME_SIZE) // 2
-
 
 pygame.init()
 
@@ -48,15 +61,17 @@ pygame.display.set_caption("Minesweeper")
 
 # Load Assets
 # Hidden Tile 
-hidden_tile = pygame.image.load("src/gui/assets/hidden_tile.png").convert_alpha()
+hidden_tile_original = pygame.image.load(
+    "src/gui/assets/hidden_tile.png"
+).convert_alpha()
 
 # Revealed light tile
-revealed_light = pygame.image.load(
+revealed_light_original = pygame.image.load(
     "src/gui/assets/revealed_tile_light.png"
 ).convert_alpha()
 
 # Revealed dark tile
-revealed_dark = pygame.image.load(
+revealed_dark_original = pygame.image.load(
     "src/gui/assets/revealed_tile_dark.png"
 ).convert_alpha()
 
@@ -69,6 +84,12 @@ mine_image = pygame.image.load(
 number_font = pygame.font.Font(
     "src/gui/assets/pixel_font.ttf",
     28
+)
+
+# Difficulty menu text
+menu_font = pygame.font.Font(
+    "src/gui/assets/pixel_font.ttf",
+    18
 )
 
 # Mine counter number
@@ -103,9 +124,9 @@ home_image = pygame.image.load(
 ).convert_alpha()
 
 # Scale assets to match tile size
-hidden_tile = pygame.transform.scale(hidden_tile, (TILE_SIZE, TILE_SIZE))
-revealed_light = pygame.transform.scale(revealed_light, (TILE_SIZE, TILE_SIZE))
-revealed_dark = pygame.transform.scale(revealed_dark, (TILE_SIZE, TILE_SIZE))
+hidden_tile = pygame.transform.scale(hidden_tile_original,(TILE_SIZE, TILE_SIZE))
+revealed_light = pygame.transform.scale(revealed_light_original,(TILE_SIZE, TILE_SIZE))
+revealed_dark = pygame.transform.scale(revealed_dark_original,(TILE_SIZE, TILE_SIZE))
 mine_image = pygame.transform.scale(mine_image, (MINE_SIZE, MINE_SIZE))
 flag_image = pygame.transform.scale(flag_image, (FLAG_SIZE, FLAG_SIZE))
 smiley_normal = pygame.transform.scale(smiley_normal, (SMILEY_SIZE, SMILEY_SIZE))
@@ -126,6 +147,7 @@ timer_started = False
 start_ticks = 0
 elapsed_seconds = 0
 
+current_screen = "game"
 running = True
 
 while running:
@@ -133,16 +155,158 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-        # Check for smiley reset click
+        # Check for difficulty button clicks on the menu
+        if (
+            current_screen == "menu"
+            and event.type == pygame.MOUSEBUTTONDOWN
+            and event.button == 1
+        ):
+            mouse_x, mouse_y = event.pos
+
+            if (
+                button_x <= mouse_x < button_x + button_width
+                and beginner_y <= mouse_y < beginner_y + button_height
+            ):
+                current_difficulty = "beginner"
+
+            elif (
+                button_x <= mouse_x < button_x + button_width
+                and intermediate_y <= mouse_y < intermediate_y + button_height
+            ):
+                current_difficulty = "intermediate"
+
+            elif (
+                button_x <= mouse_x < button_x + button_width
+                and expert_y <= mouse_y < expert_y + button_height
+            ):
+                current_difficulty = "expert"
+
+            (
+                BOARD_ROWS,
+                BOARD_COLUMNS,
+                MINE_COUNT,
+                TILE_SIZE,
+                BOARD_WIDTH,
+                BOARD_HEIGHT,
+                WIDTH,
+                HEIGHT,
+                SMILEY_BOX_X,
+                TIMER_X,
+                HOME_X,
+                HOME_Y
+            ) = apply_difficulty(current_difficulty)
+
+            # Resize the window for the selected difficulty
+            screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+            # Create a fresh board using the selected difficulty
+            board = create_board(Cell, BOARD_ROWS, BOARD_COLUMNS)
+
+            # Reset game state for the new difficulty
+            first_click = True
+            game_over = False
+            lost = False
+            won = False
+
+            timer_started = False
+            start_ticks = 0
+            elapsed_seconds = 0
+
+            # Resize board tile assets for the selected difficulty
+            hidden_tile = pygame.transform.scale(hidden_tile_original,(TILE_SIZE, TILE_SIZE))
+            revealed_light = pygame.transform.scale(revealed_light_original,(TILE_SIZE, TILE_SIZE))
+            revealed_dark = pygame.transform.scale(revealed_dark_original,(TILE_SIZE, TILE_SIZE))
+
+            # Return to the game screen
+            current_screen = "game"
+
+            continue
+
+        # Check for home button click
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             mouse_x, mouse_y = event.pos
 
             if (
                 HOME_X <= mouse_x < HOME_X + HOME_SIZE
                 and HOME_Y <= mouse_y < HOME_Y + HOME_SIZE
-                ):
-                    # Home menu logic will go here
-                    continue
+            ):
+                current_screen = "menu"
+                # Draw menu background
+                screen.fill(BACKGROUND_COLOR)
+
+                # Draw menu title
+                menu_title = number_font.render(
+                    "MINESWEEPER",
+                    False,
+                    COUNTER_TEXT_COLOR
+                )
+
+                menu_title_rect = menu_title.get_rect(
+                    center=(WIDTH // 2, 100)
+                )
+
+                screen.blit(menu_title, menu_title_rect)
+
+                # Difficulty button sizes
+                button_width = 220
+                button_height = 55
+
+                # Center buttons horizontally
+                button_x = (WIDTH - button_width) // 2
+
+                beginner_y = 180
+                intermediate_y = 250
+                expert_y = 320
+
+                # Draw difficulty buttons
+                pygame.draw.rect(
+                    screen,
+                    BEGINNER_COLOR,
+                    (button_x, beginner_y, button_width, button_height)
+                )
+
+                pygame.draw.rect(
+                    screen,
+                    INTERMEDIATE_COLOR,
+                    (button_x, intermediate_y, button_width, button_height)
+                )
+
+                pygame.draw.rect(
+                    screen,
+                    EXPERT_COLOR,
+                    (button_x, expert_y, button_width, button_height)
+                )
+
+                # Create difficulty button labels
+                beginner_text = menu_font.render("BEGINNER", False, (255, 255, 255))
+                intermediate_text = menu_font.render("INTERMEDIATE", False, (255, 255, 255))
+                expert_text = menu_font.render("EXPERT", False, (255, 255, 255))
+
+                # Center each label inside its button
+                beginner_rect = beginner_text.get_rect(
+                    center=(button_x + button_width // 2, beginner_y + button_height // 2)
+                )
+
+                intermediate_rect = intermediate_text.get_rect(
+                    center=(button_x + button_width // 2, intermediate_y + button_height // 2)
+                )
+
+                expert_rect = expert_text.get_rect(
+                    center=(button_x + button_width // 2, expert_y + button_height // 2)
+                )
+
+                # Draw difficulty labels
+                screen.blit(beginner_text, beginner_rect)
+                screen.blit(intermediate_text, intermediate_rect)
+                screen.blit(expert_text, expert_rect)
+
+                pygame.display.flip()
+                continue
+
+        # Check for smiley reset click
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            mouse_x, mouse_y = event.pos
+
             if (
                 SMILEY_BOX_X <= mouse_x < SMILEY_BOX_X + SMILEY_BOX_SIZE
                 and SMILEY_BOX_Y <= mouse_y < SMILEY_BOX_Y + SMILEY_BOX_SIZE
@@ -162,7 +326,13 @@ while running:
                 # reset loop
                 continue
 
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not game_over:
+        # Handle board left-clicks only while the game screen is active
+        if (
+            current_screen == "game"
+            and event.type == pygame.MOUSEBUTTONDOWN
+            and event.button == 1
+            and not game_over
+        ):
             mouse_x, mouse_y = event.pos
 
             # Convert the mouse position into a board row and column
@@ -209,9 +379,14 @@ while running:
             if not game_over and check_win(board):
                 game_over = True
                 won = True
-                print("You Win!")
 
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3 and not game_over:
+        # Handle board right-clicks only while the game screen is active
+        if (
+            current_screen == "game"
+            and event.type == pygame.MOUSEBUTTONDOWN
+            and event.button == 3
+            and not game_over
+        ):
             mouse_x, mouse_y = event.pos
 
             # Convert the mouse position into a board row and column
@@ -228,6 +403,9 @@ while running:
 
             # Flag or unflag the tile
             toggle_flag(board, row, column)
+
+    if current_screen == "menu":
+        continue
 
     # Update timer while the game is active
     if timer_started and not game_over:
