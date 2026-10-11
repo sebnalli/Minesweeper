@@ -152,8 +152,24 @@ running = True
 
 while running:
     for event in pygame.event.get():
+
         if event.type == pygame.QUIT:
             running = False
+
+        # Check for back button click
+        if (
+            current_screen == "menu"
+            and event.type == pygame.MOUSEBUTTONDOWN
+            and event.button == 1
+        ):
+            mouse_x, mouse_y = event.pos
+
+            if (
+                BACK_BUTTON_X <= mouse_x < BACK_BUTTON_X + BACK_BUTTON_WIDTH
+                and BACK_BUTTON_Y <= mouse_y < BACK_BUTTON_Y + BACK_BUTTON_HEIGHT
+            ):
+                current_screen = "game"
+                continue
 
         # Check for difficulty button clicks on the menu
         if (
@@ -233,6 +249,28 @@ while running:
                 current_screen = "menu"
                 # Draw menu background
                 screen.fill(BACKGROUND_COLOR)
+
+                # Draw back button
+                pygame.draw.rect(
+                    screen,
+                    COUNTER_BACKGROUND,
+                    (BACK_BUTTON_X, BACK_BUTTON_Y, BACK_BUTTON_WIDTH, BACK_BUTTON_HEIGHT)
+                )
+
+                back_text = menu_font.render(
+                    "BACK",
+                    False,
+                    COUNTER_TEXT_COLOR
+                )
+
+                back_rect = back_text.get_rect(
+                    center=(
+                        BACK_BUTTON_X + BACK_BUTTON_WIDTH // 2,
+                        BACK_BUTTON_Y + BACK_BUTTON_HEIGHT // 2
+                    )
+                )
+
+                screen.blit(back_text, back_rect)
 
                 # Draw menu title
                 menu_title = number_font.render(
