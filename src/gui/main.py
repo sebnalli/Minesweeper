@@ -59,6 +59,19 @@ def apply_difficulty(difficulty):
     HOME_Y
 )
 
+def reset_game_state():
+    """Returns the default GUI game state."""
+    return (
+        True,   # first_click
+        False,  # game_over
+        False,  # lost
+        False,  # won
+        False,  # timer_started
+        0,      # start_ticks
+        0       # elapsed_seconds
+    )
+
+
 pygame.init()
 
 # Open window display
@@ -154,15 +167,16 @@ current_difficulty = "beginner"
 # Create board
 board = create_board(Cell, BOARD_ROWS, BOARD_COLUMNS)
 
-first_click = True
-game_over = False
-lost = False
-won = False
-
-# Timer state
-timer_started = False
-start_ticks = 0
-elapsed_seconds = 0
+# Set starting game state
+(
+    first_click,
+    game_over,
+    lost,
+    won,
+    timer_started,
+    start_ticks,
+    elapsed_seconds
+) = reset_game_state()
 
 current_screen = "game"
 running = True
@@ -236,14 +250,15 @@ while running:
             board = create_board(Cell, BOARD_ROWS, BOARD_COLUMNS)
 
             # Reset game state for the new difficulty
-            first_click = True
-            game_over = False
-            lost = False
-            won = False
-
-            timer_started = False
-            start_ticks = 0
-            elapsed_seconds = 0
+            (
+            first_click,
+            game_over,
+            lost,
+            won,
+            timer_started,
+            start_ticks,
+            elapsed_seconds
+            ) = reset_game_state()
 
             # Resize board tile assets for the selected difficulty
             hidden_tile = pygame.transform.scale(hidden_tile_original,(TILE_SIZE, TILE_SIZE))
@@ -297,14 +312,15 @@ while running:
                 # reset game state
                 board = create_board(Cell, BOARD_ROWS, BOARD_COLUMNS)
 
-                first_click = True
-                game_over = False
-                lost = False
-                won = False
-
-                timer_started = False
-                start_ticks = 0
-                elapsed_seconds = 0
+                (
+                first_click,
+                game_over,
+                lost,
+                won,
+                timer_started,
+                start_ticks,
+                elapsed_seconds
+                ) = reset_game_state()
 
                 # reset loop
                 continue
