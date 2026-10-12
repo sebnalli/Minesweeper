@@ -1,14 +1,10 @@
 def reveal_cell(board, row, column):
     """Reveals the selected cell if it is not flagged or already revealed."""
-    if board[row][column].flagged:
-        print("\nTile is flagged.\n")
+    if board[row][column].flagged or board[row][column].revealed:
         return 
-    elif board[row][column].revealed:
-       print("\nTile is already revealed.\n")
-       return
-    else:
-       board[row][column].revealed = True
-       return board
+
+    board[row][column].revealed = True
+    return board
     
 def reveal_empty_area(board, row, column):
     """
@@ -48,7 +44,6 @@ def toggle_flag(board, row, column):
     current_cell = board[row][column]
 
     if current_cell.revealed:
-        print("\nCannot flag a revealed tile.\n")
         return
     
     if not current_cell.flagged:

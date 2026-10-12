@@ -1,8 +1,14 @@
 import pygame
 from src.core.cell import Cell
 from src.core.board import create_board, mine_placement, calculate_touching_mines
+from src.gui.highscores import update_highscore, load_highscores
 from src.gui.config import *
-from src.gui.ui import draw_raised_panel, draw_sunken_panel, draw_counter_box
+from src.gui.ui import (
+    draw_raised_panel,
+    draw_sunken_panel,
+    draw_counter_box,
+    draw_menu
+)
 from src.core.game import (
     reveal_cell,
     reveal_empty_area,
@@ -141,6 +147,10 @@ smiley_loss = pygame.transform.scale(smiley_loss, (SMILEY_SIZE, SMILEY_SIZE))
 smiley_win = pygame.transform.scale(smiley_win, (SMILEY_SIZE, SMILEY_SIZE))
 home_image = pygame.transform.scale(home_image, (HOME_SIZE, HOME_SIZE))
 
+
+# Set starting difficulty
+current_difficulty = "beginner"
+
 # Create board
 board = create_board(Cell, BOARD_ROWS, BOARD_COLUMNS)
 
@@ -254,97 +264,24 @@ while running:
                 and HOME_Y <= mouse_y < HOME_Y + HOME_SIZE
             ):
                 current_screen = "menu"
-                # Draw menu background
-                screen.fill(BACKGROUND_COLOR)
 
-                # Draw back button
-                pygame.draw.rect(
+                highscores = load_highscores()
+
+                # Draw difficulty menu
+                (
+                    button_x,
+                    button_width,
+                    button_height,
+                    beginner_y,
+                    intermediate_y,
+                    expert_y
+                ) = draw_menu(
                     screen,
-                    COUNTER_BACKGROUND,
-                    (BACK_BUTTON_X, BACK_BUTTON_Y, BACK_BUTTON_WIDTH, BACK_BUTTON_HEIGHT)
+                    WIDTH,
+                    number_font,
+                    menu_font,
+                    highscores
                 )
-
-                back_text = menu_font.render(
-                    "BACK",
-                    False,
-                    COUNTER_TEXT_COLOR
-                )
-
-                back_rect = back_text.get_rect(
-                    center=(
-                        BACK_BUTTON_X + BACK_BUTTON_WIDTH // 2,
-                        BACK_BUTTON_Y + BACK_BUTTON_HEIGHT // 2
-                    )
-                )
-
-                screen.blit(back_text, back_rect)
-
-                # Draw menu title
-                menu_title = number_font.render(
-                    "MINESWEEPER",
-                    False,
-                    COUNTER_TEXT_COLOR
-                )
-
-                menu_title_rect = menu_title.get_rect(
-                    center=(WIDTH // 2, 100)
-                )
-
-                screen.blit(menu_title, menu_title_rect)
-
-                # Difficulty button sizes
-                button_width = 220
-                button_height = 55
-
-                # Center buttons horizontally
-                button_x = (WIDTH - button_width) // 2
-
-                beginner_y = 180
-                intermediate_y = 250
-                expert_y = 320
-
-                # Draw difficulty buttons
-                pygame.draw.rect(
-                    screen,
-                    BEGINNER_COLOR,
-                    (button_x, beginner_y, button_width, button_height)
-                )
-
-                pygame.draw.rect(
-                    screen,
-                    INTERMEDIATE_COLOR,
-                    (button_x, intermediate_y, button_width, button_height)
-                )
-
-                pygame.draw.rect(
-                    screen,
-                    EXPERT_COLOR,
-                    (button_x, expert_y, button_width, button_height)
-                )
-
-                # Create difficulty button labels
-                beginner_text = menu_font.render("BEGINNER", False, (255, 255, 255))
-                intermediate_text = menu_font.render("INTERMEDIATE", False, (255, 255, 255))
-                expert_text = menu_font.render("EXPERT", False, (255, 255, 255))
-
-                # Center each label inside its button
-                beginner_rect = beginner_text.get_rect(
-                    center=(button_x + button_width // 2, beginner_y + button_height // 2)
-                )
-
-                intermediate_rect = intermediate_text.get_rect(
-                    center=(button_x + button_width // 2, intermediate_y + button_height // 2)
-                )
-
-                expert_rect = expert_text.get_rect(
-                    center=(button_x + button_width // 2, expert_y + button_height // 2)
-                )
-
-                # Draw difficulty labels
-                screen.blit(beginner_text, beginner_rect)
-                screen.blit(intermediate_text, intermediate_rect)
-                screen.blit(expert_text, expert_rect)
-                
 
                 pygame.display.flip()
                 continue
@@ -425,6 +362,9 @@ while running:
             if not game_over and check_win(board):
                 game_over = True
                 won = True
+
+                # Check for highscore
+                update_highscore(current_difficulty, elapsed_seconds)
 
         # Handle board right-clicks only while the game screen is active
         if (
