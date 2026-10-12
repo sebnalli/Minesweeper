@@ -98,6 +98,12 @@ counter_font = pygame.font.Font(
     22
 )
 
+# Overlay instruction text on game over/game won
+overlay_small_font = pygame.font.Font(
+    "src/gui/assets/pixel_font.ttf",
+    12
+)
+
 # Flag
 flag_image = pygame.image.load(
     "src/gui/assets/flag.png"
@@ -122,6 +128,7 @@ smiley_win = pygame.image.load(
 home_image = pygame.image.load(
     "src/gui/assets/home.png"
 ).convert_alpha()
+
 
 # Scale assets to match tile size
 hidden_tile = pygame.transform.scale(hidden_tile_original,(TILE_SIZE, TILE_SIZE))
@@ -337,6 +344,7 @@ while running:
                 screen.blit(beginner_text, beginner_rect)
                 screen.blit(intermediate_text, intermediate_rect)
                 screen.blit(expert_text, expert_rect)
+                
 
                 pygame.display.flip()
                 continue
@@ -599,6 +607,63 @@ while running:
 
                     screen.blit(flag_image, (flag_x, flag_y))
 
+    # Draw win or loss overlay
+    if won or lost:
+        overlay_surface = pygame.Surface(
+            (OVERLAY_WIDTH, OVERLAY_HEIGHT),
+            pygame.SRCALPHA
+        )
+
+        overlay_surface.fill(OVERLAY_BACKGROUND)
+
+        # Center the overlay on the board
+        overlay_x = BOARD_X + (BOARD_WIDTH - OVERLAY_WIDTH) // 2
+        overlay_y = BOARD_Y + (BOARD_HEIGHT - OVERLAY_HEIGHT) // 2
+
+        # Draw the transparent overlay on top of the board
+        screen.blit(overlay_surface, (overlay_x, overlay_y))
+
+        # Choose the overlay message based on the game result
+        if won:
+            overlay_message = "YOU WIN!"
+        else:
+            overlay_message = "GAME OVER"
+
+        # Render the win or loss message
+        overlay_text = number_font.render(
+            overlay_message,
+            False,
+            OVERLAY_TEXT_COLOR
+        )
+
+        # Center the message inside the overlay
+        overlay_text_rect = overlay_text.get_rect(
+            center=(
+                overlay_x + OVERLAY_WIDTH // 2,
+                overlay_y + OVERLAY_HEIGHT // 2
+            )
+        )
+
+        # Draw the win or loss message on the overlay
+        screen.blit(overlay_text, overlay_text_rect)
+
+        # Render restart instructions
+        restart_text = overlay_small_font.render(
+            "CLICK SMILEY TO RESTART",
+            False,
+            OVERLAY_TEXT_COLOR
+        )
+        
+        # Center the restart instructions under the main message
+        restart_text_rect = restart_text.get_rect(
+            center=(
+                overlay_x + OVERLAY_WIDTH // 2,
+                overlay_y + OVERLAY_HEIGHT // 2 + 35
+            )
+        )
+
+        # Draw the restart instructions
+        screen.blit(restart_text, restart_text_rect)
 
     pygame.display.flip()
 
