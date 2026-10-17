@@ -585,14 +585,16 @@ while running:
         # Choose the overlay message based on the game result
         if won:
             overlay_message = "YOU WIN!"
+            overlay_color = WIN_TEXT_COLOR
         else:
             overlay_message = "GAME OVER"
+            overlay_color = LOSS_TEXT_COLOR
 
         # Render the win or loss message
         overlay_text = number_font.render(
             overlay_message,
             False,
-            OVERLAY_TEXT_COLOR
+            overlay_color
         )
 
         # Center the message inside the overlay
