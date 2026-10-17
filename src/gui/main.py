@@ -227,6 +227,9 @@ while running:
                 and expert_y <= mouse_y < expert_y + button_height
             ):
                 current_difficulty = "expert"
+            else:
+                continue
+            
 
             (
                 BOARD_ROWS,
