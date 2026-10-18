@@ -1,4 +1,5 @@
 import pygame
+import sys
 from pathlib import Path
 from src.core.cell import Cell
 from src.core.board import create_board, mine_placement, calculate_touching_mines
@@ -74,6 +75,12 @@ def reset_game_state():
 
 def asset_path(filename):
     """Returns the path to a GUI asset."""
+
+    # Use PyInstaller's temporary bundle folder when packaged
+    if hasattr(sys, "_MEIPASS"):
+        return Path(sys._MEIPASS) / "src" / "gui" / "assets" / filename
+
+    # Use the project assets folder while developing
     return Path(__file__).parent / "assets" / filename
 
 pygame.init()
