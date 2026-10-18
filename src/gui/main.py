@@ -1,4 +1,5 @@
 import pygame
+from pathlib import Path
 from src.core.cell import Cell
 from src.core.board import create_board, mine_placement, calculate_touching_mines
 from src.gui.highscores import update_highscore, load_highscores
@@ -71,6 +72,9 @@ def reset_game_state():
         0       # elapsed_seconds
     )
 
+def asset_path(filename):
+    """Returns the path to a GUI asset."""
+    return Path(__file__).parent / "assets" / filename
 
 pygame.init()
 
@@ -81,71 +85,71 @@ pygame.display.set_caption("Minesweeper")
 # Load Assets
 # Hidden Tile 
 hidden_tile_original = pygame.image.load(
-    "src/gui/assets/hidden_tile.png"
+    asset_path("hidden_tile.png")
 ).convert_alpha()
 
 # Revealed light tile
 revealed_light_original = pygame.image.load(
-    "src/gui/assets/revealed_tile_light.png"
+    asset_path("revealed_tile_light.png")
 ).convert_alpha()
 
 # Revealed dark tile
 revealed_dark_original = pygame.image.load(
-    "src/gui/assets/revealed_tile_dark.png"
+    asset_path("revealed_tile_dark.png")
 ).convert_alpha()
 
 # Mine
 mine_image = pygame.image.load(
-    "src/gui/assets/mine.png"
+    asset_path("mine.png")
 ).convert_alpha()
 
 # Touching mine number
 number_font = pygame.font.Font(
-    "src/gui/assets/pixel_font.ttf",
+    asset_path("pixel_font.ttf"),
     28
 )
 
 # Difficulty menu text
 menu_font = pygame.font.Font(
-    "src/gui/assets/pixel_font.ttf",
+    asset_path("pixel_font.ttf"),
     18
 )
 
 # Mine counter number
 counter_font = pygame.font.Font(
-    "src/gui/assets/pixel_font.ttf",
+    asset_path("pixel_font.ttf"),
     22
 )
 
 # Overlay instruction text on game over/game won
 overlay_small_font = pygame.font.Font(
-    "src/gui/assets/pixel_font.ttf",
+    asset_path("pixel_font.ttf"),
     12
 )
 
 # Flag
 flag_image = pygame.image.load(
-    "src/gui/assets/flag.png"
+    asset_path("flag.png")
 ).convert_alpha()
 
 # Standard smiley state
 smiley_normal = pygame.image.load(
-    "src/gui/assets/smiley.png"
+    asset_path("smiley.png")
 ).convert_alpha()
 
 # Smiley loss state
 smiley_loss = pygame.image.load(
-    "src/gui/assets/smiley_loss.png"
+    asset_path("smiley_loss.png")
 ).convert_alpha()
 
 # Smiley win state
 smiley_win = pygame.image.load(
-    "src/gui/assets/smiley_win.png"
+    asset_path("smiley_win.png")
 ).convert_alpha()
 
 # Home button
 home_image = pygame.image.load(
-    "src/gui/assets/home.png"
+    asset_path("home.png")
 ).convert_alpha()
 
 
