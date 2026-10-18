@@ -89,6 +89,13 @@ pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Minesweeper")
 
+# Set the game window icon
+window_icon = pygame.image.load(
+    asset_path("smiley.png")
+).convert_alpha()
+
+pygame.display.set_icon(window_icon)
+
 # Load Assets
 # Hidden Tile 
 hidden_tile_original = pygame.image.load(
